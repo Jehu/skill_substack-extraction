@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "substack-extraction"
+version = "0.1.0"
+description = "Authorized single-post Substack extractor for Markdown, media, transcripts, and followed companion links."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "beautifulsoup4>=4.12",
+]
+
+[project.scripts]
+substack-extract = "substack_extraction.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["scripts"]

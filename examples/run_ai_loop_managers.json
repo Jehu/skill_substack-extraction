@@ -1,0 +1,10 @@
+{
+  "url": "https://natesnewsletter.substack.com/p/ai-loop-managers",
+  "cookies": "/a0/usr/uploads/cookies.txt",
+  "output_root": "/a0/usr/workdir/substack_exports",
+  "include_media": true,
+  "transcribe": true,
+  "follow": ["Grab the Prompts"],
+  "follow_domain": ["promptkit.natebjones.com"],
+  "debug": false
+}

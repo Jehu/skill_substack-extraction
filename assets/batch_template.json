@@ -1,0 +1,13 @@
+{
+  "cookies": "/path/to/cookies.txt",
+  "output_root": "/path/to/substack_exports",
+  "include_media": false,
+  "transcribe": false,
+  "follow": ["Grab the Prompts"],
+  "follow_domain": ["promptkit.example.com"],
+  "debug": false,
+  "force": false,
+  "urls": [
+    "https://example.substack.com/p/post-slug"
+  ]
+}
