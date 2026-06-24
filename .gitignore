@@ -1,12 +1,47 @@
+# Python bytecode / caches
 __pycache__/
 *.py[cod]
-*.egg-info/
+*$py.class
 .pytest_cache/
 .mypy_cache/
-.venv/
-venv/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Build / packaging artifacts
+*.egg-info/
 build/
 dist/
-.DS_Store
 
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Agent Zero local project metadata and secrets
 .a0proj/
+
+# Local env/secrets
+.env
+.env.*
+*.env
+*.pem
+*.key
+cookies.txt
+*cookies*.txt
+*cookies*.json
+
+# Generated exports / run artifacts
+substack_exports/
+exports/
+*.part
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
