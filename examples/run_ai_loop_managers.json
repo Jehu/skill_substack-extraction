@@ -5,6 +5,6 @@
   "include_media": true,
   "transcribe": true,
   "follow": ["Grab the Prompts"],
-  "follow_domain": ["promptkit.natebjones.com"],
+  "follow_domain": ["promptkit.natebjones.com", "unlock-ai.natebjones.com"],
   "debug": false
 }

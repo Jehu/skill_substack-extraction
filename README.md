@@ -81,6 +81,7 @@ python3 scripts/substack_extract.py extract \
   --output-root /path/to/substack_exports \
   --follow 'Grab the Prompts' \
   --follow-domain promptkit.example.com
+  --follow-domain unlock-ai.natebjones.com
 ```
 
 Full export with media and transcript:
@@ -94,6 +95,7 @@ python3 scripts/substack_extract.py extract \
   --transcribe \
   --follow 'Grab the Prompts' \
   --follow-domain promptkit.example.com
+  --follow-domain unlock-ai.natebjones.com
 ```
 
 The command prints the export directory on success.
@@ -121,7 +123,7 @@ Batch configs support global defaults plus per-URL overrides:
   "include_media": false,
   "transcribe": false,
   "follow": ["Grab the Prompts"],
-  "follow_domain": ["promptkit.example.com"],
+  "follow_domain": ["promptkit.example.com", "unlock-ai.natebjones.com"],
   "urls": [
     "https://example.substack.com/p/one",
     {

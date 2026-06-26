@@ -4,7 +4,7 @@
   "include_media": false,
   "transcribe": false,
   "follow": ["Grab the Prompts"],
-  "follow_domain": ["promptkit.natebjones.com"],
+  "follow_domain": ["promptkit.natebjones.com", "unlock-ai.natebjones.com"],
   "debug": false,
   "force": false,
   "urls": [
