@@ -6,16 +6,11 @@ from dataclasses import dataclass
 
 from bs4 import BeautifulSoup, NavigableString, Tag
 
-DEFAULT_REQUIRED_PHRASES = [
-    "Here’s what’s inside",
-    "The work around the prompt",
-    "Why apps made this worse",
-    "When loops start noticing each other",
-    "The Mary Poppins version",
-    "What to notice first",
-    "Coming Up",
-    "Related Reading",
-]
+# Generic validation only: exported articles can have arbitrary headings.
+# Keep this empty by default; callers may pass required_phrases for a
+# one-off regression fixture, but production exports must not depend on
+# article-specific text.
+DEFAULT_REQUIRED_PHRASES: list[str] = []
 FORBIDDEN_MARKDOWN_PHRASES = [
     "subscription-widget",
     "SubscribeWidgetToDOM",
@@ -171,14 +166,17 @@ def article_markdown(post: dict, body_md: str, created_date: str | None = None) 
 
 
 def validate_article_markdown(markdown: str, required_phrases: list[str] | None = None) -> MarkdownValidation:
-    required = required_phrases or DEFAULT_REQUIRED_PHRASES
+    required = DEFAULT_REQUIRED_PHRASES if required_phrases is None else required_phrases
     missing = [phrase for phrase in required if phrase not in markdown]
     forbidden = [phrase for phrase in FORBIDDEN_MARKDOWN_PHRASES if phrase in markdown]
     image_count = len(re.findall(r"!\[[^\]]*\]\([^\)]+\)", markdown))
     heading_count = len(re.findall(r"^#{1,6} ", markdown, flags=re.M))
+    has_body = bool(re.search(r"\n---\n\s*\S", markdown, flags=re.S)) or bool(markdown.strip())
+    structural_missing = [] if has_body else ["article body"]
+    all_missing = missing + structural_missing
     return MarkdownValidation(
-        ok=not missing and not forbidden,
-        missing_required=missing,
+        ok=not all_missing and not forbidden,
+        missing_required=all_missing,
         present_forbidden=forbidden,
         image_count=image_count,
         heading_count=heading_count,

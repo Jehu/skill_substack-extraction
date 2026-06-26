@@ -62,6 +62,26 @@ class MarkdownTests(unittest.TestCase):
         self.assertIn("05-map-of-intentions", md)
         self.assertNotIn("data:image/svg", md)
 
+    def test_validation_is_not_tied_to_specific_article_headings(self):
+        md = article_markdown(
+            {
+                "title": "Different Article",
+                "canonical_url": "https://example.com/p/different",
+                "post_date": "2026-06-26T00:00:00Z",
+                "description": "Description",
+            },
+            "## Completely Different Heading\n\nBody text.\n",
+            "2026-06-26",
+        )
+        validation = validate_article_markdown(md)
+        self.assertTrue(validation.ok, validation)
+        self.assertEqual(validation.missing_required, [])
+
+    def test_validation_still_supports_explicit_required_phrases_for_fixtures(self):
+        validation = validate_article_markdown("Body only", required_phrases=["Expected fixture phrase"])
+        self.assertFalse(validation.ok)
+        self.assertEqual(validation.missing_required, ["Expected fixture phrase"])
+
 
 if __name__ == "__main__":
     unittest.main()
