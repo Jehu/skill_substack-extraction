@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from substack_extraction.transcript import expected_outputs, select_transcript_source, transcribe
+from substack_extraction.transcript import expected_outputs, find_provided_transcript_urls, select_transcript_source, transcribe
 
 
 class TranscriptTests(unittest.TestCase):
@@ -69,6 +69,41 @@ class TranscriptTests(unittest.TestCase):
             self.assertFalse(result["skipped_existing"])
             self.assertEqual(result["model"], "tiny")
             self.assertIn("Generated transcript", (out / "transcript.md").read_text(encoding="utf-8"))
+
+    def test_transcribe_uses_provider_vtt_before_whisper(self):
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            (out / "article.fragment.html").write_text(
+                '<track kind="captions" src="https://cdn.example.com/captions.vtt">',
+                encoding="utf-8",
+            )
+
+            def fake_download(url, dest, cookies_file=None, timeout=300, force=False, min_bytes=1):
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_text("WEBVTT\n\n00:00.000 --> 00:01.000\nHello from captions\n", encoding="utf-8")
+                return dest.stat().st_size, True
+
+            with patch("substack_extraction.transcript.download_file", side_effect=fake_download) as downloaded, \
+                 patch("substack_extraction.transcript.subprocess.run") as whispered:
+                result = transcribe(out)
+
+            downloaded.assert_called_once()
+            whispered.assert_not_called()
+            self.assertTrue(result["ok"])
+            self.assertEqual(result["source_kind"], "provided_transcript")
+            self.assertIn("Hello from captions", (out / "transcript.md").read_text(encoding="utf-8"))
+
+    def test_find_provided_transcript_urls_unescapes_html(self):
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            (out / "index.html").write_text(
+                'src="https://cdn.example.com/a%20caption.vtt?token=abc&amp;x=1"',
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                find_provided_transcript_urls(out),
+                ["https://cdn.example.com/a caption.vtt?token=abc&x=1"],
+            )
 
     def test_transcribe_missing_source_returns_manifest_error(self):
         with tempfile.TemporaryDirectory() as td:

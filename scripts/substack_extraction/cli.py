@@ -97,7 +97,7 @@ def extract(options: ExtractOptions) -> Path:
 
     transcript_result = None
     if options.transcribe:
-        transcript_result = transcribe(out_dir, force=options.force)
+        transcript_result = transcribe(out_dir, force=options.force, cookies=options.cookies)
 
     summary = {
         "url": options.url,
