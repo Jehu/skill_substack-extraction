@@ -176,7 +176,7 @@ def looks_like_markdown_asset(text: str) -> bool:
 
 def html_to_markdown_fallback(raw_html: bytes) -> str:
     try:
-        proc = subprocess.run(["pandoc", "-f", "html", "-t", "gfm", "--wrap=none"], input=raw_html, capture_output=True, check=True)
+        proc = subprocess.run(["pandoc", "-f", "html", "-t", "gfm-raw_html", "--wrap=none"], input=raw_html, capture_output=True, check=True)
         text = proc.stdout.decode("utf-8", errors="replace")
         if text.strip():
             return text

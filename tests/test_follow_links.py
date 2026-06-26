@@ -45,6 +45,16 @@ class FollowLinksTests(unittest.TestCase):
         self.assertIn("Body", md)
         self.assertNotIn("script", md)
 
+    def test_html_fallback_with_pandoc_removes_raw_layout_html(self):
+        html = b'<main><div class="layout"><h1>Guide</h1><a href="#overview" class="pill">Overview</a><div><p>Body</p></div></div></main>'
+        md = html_to_markdown_fallback(html)
+        self.assertIn("# Guide", md)
+        self.assertIn("[Overview](#overview)", md)
+        self.assertIn("Body", md)
+        self.assertNotIn("<div", md)
+        self.assertNotIn("</div>", md)
+        self.assertNotIn("<a ", md)
+
     def test_follow_links_stage_native_markdown_and_manifest(self):
         body = '<a href="https://promptkit.natebjones.com/asset1">Grab the Prompts</a>'
         page_html = b"<html><head><title>Prompt Kit Page</title></head><body>html body</body></html>"
