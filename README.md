@@ -70,6 +70,20 @@ Do **not** paste cookie values into chat or commit them to git. The `.gitignore`
 
 See [`references/cookie-handling.md`](references/cookie-handling.md).
 
+## Environment configuration
+
+`--output-root` is optional when `SUBSTACK_EXPORT_ROOT` is set, and `--cookies` is optional when `SUBSTACK_COOKIES` is set. Manual CLI values always win over JSON config values and environment variables, keeping the CLI portable while letting wrappers choose runtime paths.
+
+```bash
+export SUBSTACK_EXPORT_ROOT=/path/to/substack_exports
+export SUBSTACK_COOKIES=/path/to/cookies.txt
+python3 scripts/substack_extract.py extract --url 'https://example.substack.com/p/post-slug'
+```
+
+See [`assets/substack.env.example`](assets/substack.env.example) for a non-secret template. Copy real env files outside the skill directory and do not commit cookie paths or secrets.
+
+If neither `--output-root`/`SUBSTACK_EXPORT_ROOT` nor `--cookies`/`SUBSTACK_COOKIES` is set, the CLI preserves the existing behavior and asks for the missing paths.
+
 ## Single-post export
 
 Fast article export with linked Promptkit pages, no large media download:

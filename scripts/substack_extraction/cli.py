@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -24,17 +25,33 @@ def load_config(path: Path) -> dict:
     raise SystemExit("Only JSON config files are currently supported")
 
 
+def resolve_env_path(env_name: str, *values: str | None) -> Path | None:
+    for value in values:
+        if value:
+            return Path(value)
+    env_value = os.environ.get(env_name)
+    return Path(env_value) if env_value else None
+
+
+def resolve_output_root(*values: str | None) -> Path | None:
+    return resolve_env_path("SUBSTACK_EXPORT_ROOT", *values)
+
+
+def resolve_cookies(*values: str | None) -> Path | None:
+    return resolve_env_path("SUBSTACK_COOKIES", *values)
+
+
 def options_from_args(args: argparse.Namespace) -> ExtractOptions:
     cfg = load_config(Path(args.config)) if args.config else {}
     url = args.url or cfg.get("url")
-    cookies = args.cookies or cfg.get("cookies")
-    output_root = args.output_root or cfg.get("output_root")
+    cookies = resolve_cookies(args.cookies, cfg.get("cookies"))
+    output_root = resolve_output_root(args.output_root, cfg.get("output_root"))
     if not url or not cookies or not output_root:
-        raise SystemExit("Required: --url, --cookies, --output-root (or JSON --config with url/cookies/output_root)")
+        raise SystemExit("Required: --url, --cookies or SUBSTACK_COOKIES, --output-root or SUBSTACK_EXPORT_ROOT (or JSON --config with url/cookies/output_root)")
     return ExtractOptions(
         url=url,
-        cookies=Path(cookies),
-        output_root=Path(output_root),
+        cookies=cookies,
+        output_root=output_root,
         include_media=args.include_media or bool(cfg.get("include_media")),
         transcribe=args.transcribe or bool(cfg.get("transcribe")),
         follow=list(args.follow or cfg.get("follow") or []),
@@ -132,10 +149,10 @@ def batch_options_from_config(config_path: Path) -> tuple[list[ExtractOptions], 
     urls = cfg.get("urls") or cfg.get("post_urls") or []
     if not urls:
         raise SystemExit("Batch config requires urls/post_urls")
-    cookies = cfg.get("cookies")
-    output_root = cfg.get("output_root")
+    cookies = resolve_cookies(cfg.get("cookies"))
+    output_root = resolve_output_root(cfg.get("output_root"))
     if not cookies or not output_root:
-        raise SystemExit("Batch config requires cookies and output_root")
+        raise SystemExit("Batch config requires cookies or SUBSTACK_COOKIES and output_root or SUBSTACK_EXPORT_ROOT")
 
     options: list[ExtractOptions] = []
     for item in urls:
@@ -150,8 +167,8 @@ def batch_options_from_config(config_path: Path) -> tuple[list[ExtractOptions], 
             raise SystemExit(f"Batch URL item missing url: {item!r}")
         options.append(ExtractOptions(
             url=url,
-            cookies=Path(item_cfg.get("cookies") or cookies),
-            output_root=Path(item_cfg.get("output_root") or output_root),
+            cookies=resolve_cookies(item_cfg.get("cookies"), str(cookies)),
+            output_root=resolve_output_root(item_cfg.get("output_root"), str(output_root)),
             include_media=bool(item_cfg.get("include_media", cfg.get("include_media", False))),
             transcribe=bool(item_cfg.get("transcribe", cfg.get("transcribe", False))),
             follow=_list_value(item_cfg.get("follow", cfg.get("follow", []))),
@@ -164,7 +181,9 @@ def batch_options_from_config(config_path: Path) -> tuple[list[ExtractOptions], 
 
 def run_batch(config_path: Path, continue_on_error: bool = False) -> dict:
     options, cfg = batch_options_from_config(config_path)
-    output_root = Path(cfg["output_root"])
+    output_root = resolve_output_root(cfg.get("output_root"))
+    if output_root is None:
+        raise SystemExit("Batch config requires output_root or SUBSTACK_EXPORT_ROOT")
     output_root.mkdir(parents=True, exist_ok=True)
     results = []
     for i, opt in enumerate(options):

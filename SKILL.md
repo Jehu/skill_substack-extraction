@@ -29,6 +29,8 @@ Run via the portable launcher:
 python3 scripts/substack_extract.py --help
 ```
 
+`--output-root` can be omitted when `SUBSTACK_EXPORT_ROOT` is set, and `--cookies` can be omitted when `SUBSTACK_COOKIES` is set by the caller or host environment. Explicit CLI values always take precedence. See `assets/substack.env.example` for a non-secret template; keep real env files outside the skill directory.
+
 If this repo has been installed as a package, this also works:
 
 ```bash
