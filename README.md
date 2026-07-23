@@ -80,7 +80,7 @@ python3 scripts/substack_extract.py extract \
   --cookies /path/to/cookies.txt \
   --output-root /path/to/substack_exports \
   --follow 'Grab the Prompts' \
-  --follow-domain promptkit.example.com
+  --follow-domain promptkit.example.com \
   --follow-domain unlock-ai.natebjones.com
 ```
 
@@ -94,7 +94,7 @@ python3 scripts/substack_extract.py extract \
   --include-media \
   --transcribe \
   --follow 'Grab the Prompts' \
-  --follow-domain promptkit.example.com
+  --follow-domain promptkit.example.com \
   --follow-domain unlock-ai.natebjones.com
 ```
 
